@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Form with HTMX</title>
+    <title>Login & Registration with HTMX</title>
     <!-- Include HTMX from CDN -->
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <style>
@@ -20,7 +20,7 @@
             display: block;
             margin-bottom: 5px;
         }
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="password"], input[type="email"] {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
@@ -31,6 +31,7 @@
             color: white;
             border: none;
             cursor: pointer;
+            margin-right: 10px;
         }
         .error {
             color: red;
@@ -47,34 +48,102 @@
             border-radius: 4px;
             display: none;
         }
+        .form-toggle {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .form-toggle a {
+            color: #4CAF50;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .form-toggle a:hover {
+            text-decoration: underline;
+        }
+        .form-container {
+            display: block;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <h1>Login Form</h1>
+    <div id="login-container" class="form-container">
+        <h1>Login Form</h1>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="login-username">Username:</label>
+                <input type="text" id="login-username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" name="password" required>
+            </div>
+            
+            <button type="submit">Login</button>
+        </form>
+        
+        <div class="form-toggle">
+            <p>New user? <a id="show-register">Register here</a></p>
+        </div>
+    </div>
     
-    <form id="login-form">
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
+    <div id="register-container" class="form-container hidden">
+        <h1>Registration Form</h1>
         
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
+        <form id="register-form">
+            <div class="form-group">
+                <label for="register-username">Username:</label>
+                <input type="text" id="register-username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-email">Email:</label>
+                <input type="email" id="register-email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-password">Password:</label>
+                <input type="password" id="register-password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-confirm-password">Confirm Password:</label>
+                <input type="password" id="register-confirm-password" name="confirmPassword" required>
+            </div>
+            
+            <button type="submit">Register</button>
+        </form>
         
-        <button type="submit">Login</button>
-    </form>
+        <div class="form-toggle">
+            <p>Already have an account? <a id="show-login">Login here</a></p>
+        </div>
+    </div>
     
     <div id="result-area"></div>
 
     <script>
+        // Toggle between login and registration forms
+        document.getElementById('show-register').addEventListener('click', function() {
+            document.getElementById('login-container').classList.add('hidden');
+            document.getElementById('register-container').classList.remove('hidden');
+        });
+        
+        document.getElementById('show-login').addEventListener('click', function() {
+            document.getElementById('register-container').classList.add('hidden');
+            document.getElementById('login-container').classList.remove('hidden');
+        });
+
+        // Handle login form submission
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Get form data
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
             
             // Create JSON payload
             const jsonData = {
@@ -84,6 +153,52 @@
             
             // Send POST request using fetch API
             fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => response.text())
+            .then(html => {
+                // Display the result
+                const resultArea = document.getElementById('result-area');
+                resultArea.innerHTML = html;
+                resultArea.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result-area').innerHTML = '<div class="error"><p>An error occurred. Please try again.</p></div>';
+                document.getElementById('result-area').style.display = 'block';
+            });
+        });
+
+        // Handle registration form submission
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                document.getElementById('result-area').innerHTML = '<div class="error"><p>Passwords do not match!</p></div>';
+                document.getElementById('result-area').style.display = 'block';
+                return;
+            }
+            
+            // Create JSON payload
+            const jsonData = {
+                username: username,
+                email: email,
+                password: password
+            };
+            
+            // Send POST request using fetch API
+            fetch('/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

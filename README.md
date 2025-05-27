@@ -1,10 +1,11 @@
-# Login App with HTMX and Go
+# Login & Registration App with HTMX and Go
 
-This is a simple login application that demonstrates how to use HTMX with a Go backend. The application features:
+This is a simple login and registration application that demonstrates how to use HTMX with a Go backend. The application features:
 
 - A login form that submits data as JSON
-- A Go backend that processes the login request
-- HTMX for handling the response without page reload
+- A registration form for new users
+- A Go backend that processes both login and registration requests
+- HTMX for handling the responses without page reload
 
 ## Project Structure
 
@@ -29,23 +30,28 @@ go run main.go
 
 ## How It Works
 
-1. The login form uses HTMX to submit data as JSON to the `/login` endpoint
-2. The Go server processes the request and returns an HTML fragment
-3. HTMX swaps the response into the page without a full page reload
+1. The application provides both login and registration forms
+2. Users can toggle between the forms using links
+3. Form data is submitted as JSON to the respective endpoints (`/login` or `/register`)
+4. The Go server processes the request and returns an HTML fragment
+5. The response is displayed on the page without a full page reload
 
 ## Features
 
 - JSON request/response handling
-- Form validation
+- Form validation (including password matching)
 - Dynamic content updates with HTMX
 - Clean separation of frontend and backend
+- Seamless switching between login and registration forms
 
 ## Notes
 
-This is a demonstration application and does not implement actual authentication. In a production environment, you would:
+This is a demonstration application and does not implement actual authentication or user storage. In a production environment, you would:
 
 - Use HTTPS
 - Implement proper password hashing
 - Use sessions or JWT for authentication
 - Add CSRF protection
 - Store user credentials in a database
+- Implement email verification
+- Add more robust input validation
