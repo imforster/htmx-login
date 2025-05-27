@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form with HTMX</title>
+    <!-- Include HTMX from CDN -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+        #result-area {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login Form</h1>
+    
+    <form id="login-form">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <button type="submit">Login</button>
+    </form>
+    
+    <div id="result-area"></div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Create JSON payload
+            const jsonData = {
+                username: username,
+                password: password
+            };
+            
+            // Send POST request using fetch API
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => response.text())
+            .then(html => {
+                // Display the result
+                const resultArea = document.getElementById('result-area');
+                resultArea.innerHTML = html;
+                resultArea.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result-area').innerHTML = '<div class="error"><p>An error occurred. Please try again.</p></div>';
+                document.getElementById('result-area').style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
